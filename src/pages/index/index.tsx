@@ -1,5 +1,5 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View,Image } from '@tarojs/components'
+import { View,Text } from '@tarojs/components'
 import { AtForm,AtInput,AtButton } from 'taro-ui'
 import './index.scss'
 
@@ -13,42 +13,41 @@ export default class Index extends Component {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Config = {
-    navigationBarTitleText: '首页'
+    navigationBarTitleText: '登录'
   }
 
   constructor() {
     super(...arguments)
     this.state = {
-      value: ''
+      loginName: '',
+      password: ''
     }
   }
 
-  onSubmit (event) {
-    console.log(event)
+  login (e) {
+    console.log(111);
+    console.log(e.details)
   }
-  onReset (event) {
-    console.log(event)
+  handleChange (e) {
+    console.log(e);
   }
-  handleChange () {
-
+  register (e) {
+    console.log(33);
   }
 
   render() {
     return (
       <View className='components-page margin-top-v'>
-        <AtForm
-          onSubmit={this.onSubmit.bind(this)}
-          onReset={this.onReset.bind(this)}
-        >
+        <AtForm>
           <View className='at-row'>
             <View className='at-col at-col-1'></View>
             <View className='at-col'>
                 <AtInput
-                name='value'
-                title='文本'
+                name='loginName'
+                title='登录号'
                 type='text'
-                placeholder='单行文本'
-                value={this.state.value}
+                placeholder='手机号/用户名'
+                value={this.state.loginName}
                 onChange={this.handleChange.bind(this)}
               />
             </View>
@@ -58,11 +57,11 @@ export default class Index extends Component {
             <View className='at-col at-col-1'></View>
             <View className='at-col'>
                 <AtInput
-                name='value'
-                title='文本'
-                type='text'
-                placeholder='单行文本'
-                value={this.state.value}
+                name='password'
+                title='密码'
+                type='password'
+                placeholder='6位以上'
+                value={this.state.password}
                 onChange={this.handleChange.bind(this)}
               />
             </View>
@@ -71,8 +70,13 @@ export default class Index extends Component {
           <View className='at-row'>
             <View className='at-col at-col-1'></View>
             <View className='at-col'>
-              <AtButton formType='submit'>提交</AtButton>
+              <AtButton type='primary' onClick={this.login.bind(this)}>登录</AtButton>
             </View>
+            <View className='at-col at-col-1'></View>
+          </View>
+          <View className='at-row'>
+            <View className='at-col at-col-1'></View>
+            <View className='at-col'><Text onClick={this.register.bind(this)}>aaa</Text></View>
             <View className='at-col at-col-1'></View>
           </View>
         </AtForm>
