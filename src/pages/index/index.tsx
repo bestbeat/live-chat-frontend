@@ -25,8 +25,10 @@ export default class Index extends Component {
   }
 
   login (e) {
-    console.log(111);
-    console.log(e.details)
+    // 跳转到目的页面，打开新页面
+    Taro.navigateTo({
+      url: '/pages/home/home'
+    })
   }
   handleChange (e) {
     console.log(e);
