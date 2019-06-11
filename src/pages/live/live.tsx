@@ -2,6 +2,7 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { View,Video } from '@tarojs/components'
 import { AtNavBar,AtDrawer } from 'taro-ui'
 import './live.scss'
+import {getMedia} from './liveJS.js'
 
 export default class Live extends Component {
 
@@ -14,6 +15,10 @@ export default class Live extends Component {
     this.state = {
         drawerShow: false
     }
+  }
+  
+  componentDidMount() {
+    getMedia();
   }
 
   // 去用户操作列表
