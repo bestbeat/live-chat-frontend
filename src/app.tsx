@@ -21,7 +21,9 @@ class App extends Component {
   config: Config = {
     pages: [
       'pages/index/index',
-      'pages/home/home'
+      'pages/home/home',
+      'pages/live/live',
+      'pages/watch/watch'
     ],
     window: {
       backgroundTextStyle: 'light',
