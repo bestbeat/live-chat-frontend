@@ -1,24 +1,24 @@
 
+    import '../../extend/adapter.js'
     
-    function gotUserMedia(stream) {
-        myVideoStream = stream;
 
-        // attachMediaStream(myVideo,myVideoStream);
+
+
+    function getMedia() {
+        var getUserMedia = navigator.getUserMedia;
+        getUserMedia({"audio":true,"video":true},gotUserMedia,didntGetUserMedia);
+    }
+
+    function gotUserMedia(stream) {
+        var video = document.getElementById("video");
+        window.stream = stream;
+        console.log(window.URL);
+        video.srcObject  = stream;
+        video.play();
     }
 
     function didntGetUserMedia(){
         console.log("couldn't get video");
-    }
-    
-    function getMedia() {
-        console.log(1);
-        var getUserMedia = navigator.getUserMedia;
-        console.log(getUserMedia);
-        getUserMedia({"audio":true,"video":true},function(){
-
-        },function(){
-
-        });
     }
 
     
