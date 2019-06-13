@@ -2,7 +2,7 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { View,Video } from '@tarojs/components'
 import { AtNavBar,AtDrawer } from 'taro-ui'
 import './live.scss'
-import {getMedia} from './liveJS.js'
+import {mediaInit} from './liveJS.js'
 
 export default class Live extends Component {
 
@@ -18,7 +18,7 @@ export default class Live extends Component {
   }
   
   componentDidMount() {
-    getMedia();
+    mediaInit('video');
   }
 
   // 去用户操作列表

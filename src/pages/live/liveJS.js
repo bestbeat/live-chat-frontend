@@ -1,6 +1,8 @@
 
     import '../../extend/adapter.js'
     import '../../extend/clientWebsocketSignaling.js'
+
+    var queryparams;
     
     var signalingChannel,key,id,
         haveLocalMedia = false,
@@ -91,6 +93,7 @@
     // 展示 video 流
     function attachMediaStream(video,videoStream) {
         video.srcObject = videoStream
+        video.play();
     }
 
     // 获取本地媒体
@@ -108,12 +111,6 @@
         // 等待 RTCPeerConnection 创建完毕
         attachMediaIfReady();
 
-        // var pc = new RTCPeerConnection({
-        //     iceServers:[{"url":"stun:stun.l.google.com:19302"},
-        //                 {"url":"turn:118.31.110.11:3478","username":"zqq","credential":"test"}]   
-        // });
-        // pc.addStream(stream);
-        // video.play();
     }
 
     function didntGetUserMedia(){
@@ -170,6 +167,75 @@
         attachMediaIfReady();
     }
     
+    // 如果存在另一个候选项，则将其发送给对等端
+    function onIceCandidate(e) {
+        if (e.candidate) {
+            send({type: 'candidate',mlineindex: e.candidate.sdpMLineIndex,candidate: e.candidate.candidate});
+        }
+    }
 
-    export {getMedia}
+    // 如果另一端添加了媒体流，则将其显示在屏幕上
+    function onRemoteStreamAdded(e) {
+        remoteVideoStream = e.stream;
+        attachMediaStream(remoteVideo,remoteVideoStream);
+        setStatus("On Call");
+    }
+
+    // 远程端移除流操作
+    function onRemoteStreamRemoved(e) {
+
+    }
+
+    // 此守护例程实际上用于对两项异步活动的完成时间进行同步：
+    // 一是创建对等连接；二是获取本地媒体
+    function attachMediaIfReady() {
+        // 如果 RTCPeerConnection 已经就绪，
+        // 并且我们已获得本地媒体，则继续处理。
+        if (pc && haveLocalMedia ) {
+            attachMedia();
+        }
+    }
+
+    // 此例程将我们的本地媒体流添加至对等连接
+    // 请注意，这不会导致任何媒体开始流动
+    // 其作用只是指示浏览器在旗下一个SDP 描述中加入此流
+    function attachMedia() {
+        pc.addStream(localVideoStream);
+        setStatus("Ready for call");
+
+        // 如果 URI 中 call 参数的值表示 true,则自动执行调用，
+        // 但还要确保我们已完成连接之前的所有步骤（提高两端已一切就绪的概率）
+        if (queryparams && queryparams['call'] && !weWaited) {
+            call();
+        }
+    }
+
+    // 呼叫-为提议生成会话描述
+    function call() {
+        pc.createOffer(gotDescription,doNothing,constraints);
+    }
+
+    // 应答-为应答生成会话描述
+    function answer() {
+        pc.createAnswer(gotDescription,doNothing,constraints);
+    }
+
+    // 获取会话描述
+    // 将其用作本地描述
+    // 发送给另一端的浏览器
+    // 只有先设置了本地描述，才能发送媒体，并接受另一端媒体
+    function gotDescription(localDesc) {
+        pc.setLocalDescription(localDesc);
+        send(localDesc);
+    }
+
+    // 此函数将通过隐藏、显示和填充各种 UI 元素，
+    // 让用户大体了解浏览器在建立信令通道、
+    // 获取本地媒体、创建对等连接
+    // 以及实际连接媒体（呼叫）方面的进度。
+    function setStatus(str) {
+        
+    }
+
+    export {mediaInit}
 
