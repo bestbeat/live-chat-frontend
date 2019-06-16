@@ -11,7 +11,7 @@ const config = {
   outputRoot: 'dist',
   plugins: {
     babel: {
-      sourceMap: true,
+      sourceMap: false,
       presets: [
         ['env', {
           modules: false
@@ -91,7 +91,12 @@ const config = {
         }
       }
     },
-    esnextModules: ['taro-ui']
+    esnextModules: ['taro-ui'],
+    devServer: {
+      host: '192.168.199.230',
+      useLocalIp: false,
+      https: true
+    }
   }
 }
 

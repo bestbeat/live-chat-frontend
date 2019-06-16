@@ -1,41 +1,28 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View,Video } from '@tarojs/components'
-import { AtNavBar,AtDrawer } from 'taro-ui'
-import './live.scss'
+import { AtNavBar } from 'taro-ui'
+import './videoCall.scss'
 import {videoCall} from '../../extend/videoCallJS.js'
 
-export default class Live extends Component {
+export default class VideoCall extends Component {
 
   config: Config = {
-    navigationBarTitleText: '直播'
+    navigationBarTitleText: '视频通话'
   }
 
   constructor() {
     super(...arguments)
-    this.state = {
-        drawerShow: false
-    }
+    
   }
   
   componentDidMount() {
-    // videoCall('localVideo','remoteVideo',{});
+    videoCall.init('localVideo','remoteVideo',this.$router.params);
+    // videoCall.send({method:'connect',secretKey:this.$router.params['key']});
   }
 
-  // 去用户操作列表
-  toOpList = ()=> {
-    this.setState({
-      drawerShow: true
-    });
-  }
-
-  // 用户列表关闭出发时间
-  closeOpList (e) {
-    console.info('close drawer');
-  }
-
-  // 返回
-  goback = () => {
-    console.info('go back');
+  // 结束通话
+  hangup = () => {
+    console.info('hang up');
   }
 
   render() {
@@ -44,12 +31,10 @@ export default class Live extends Component {
             <View className='at-row'>
                 <View className='at-col'>
                     <AtNavBar
-                    onClickRgIconSt={this.toOpList}
-                    onClickLeftIcon={this.goback}
+                    onClickLeftIcon={this.hangup}
                     color='#000'
-                    title='主页'
-                    leftText='返回'
-                    rightFirstIconType='user'
+                    title='通话中...'
+                    leftText='结束'
                     />
                 </View>
             </View>
@@ -79,13 +64,6 @@ export default class Live extends Component {
                     />
                 </View>
             </View>
-            <AtDrawer 
-              show={this.state.drawerShow} 
-              right 
-              mask 
-              onClose={this.closeOpList.bind(this)} 
-              items={['设置', '注销']}
-            ></AtDrawer>
         </View>
     )
   }

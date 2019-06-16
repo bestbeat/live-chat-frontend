@@ -23,7 +23,8 @@ class App extends Component {
       'pages/index/index',
       'pages/home/home',
       'pages/live/live',
-      'pages/watch/watch'
+      'pages/watch/watch',
+      'pages/videoCall/videoCall'
     ],
     window: {
       backgroundTextStyle: 'light',

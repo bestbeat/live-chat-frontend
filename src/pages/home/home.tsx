@@ -1,6 +1,6 @@
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View,Swiper, SwiperItem } from '@tarojs/components'
-import { AtGrid,AtNavBar,AtTabBar,AtDrawer } from 'taro-ui'
+import { View} from '@tarojs/components'
+import { AtAccordion,AtList,AtListItem,AtNavBar,AtDrawer } from 'taro-ui'
 import './home.scss'
 
 export default class Home extends Component {
@@ -14,8 +14,8 @@ export default class Home extends Component {
     this.state = {
       // 用户操作列表弹出开关
       drawerShow: false,
-      // 底部TAB当前选中索引
-      tabCurrent: -1
+      // 手风琴状态
+      accordionOpen: true
     }
   }
   // 去用户操作列表
@@ -24,20 +24,7 @@ export default class Home extends Component {
       drawerShow: true
     });
   }
-  // 处理底部TAB点击事件
-  handleTabClick = (tabIndex) => {
-    this.setState({
-      tabCurrent: tabIndex
-    });
-    // console.log(tabIndex);
-    if (tabIndex == 1) {
-      // 跳转到目的页面，打开直播页面
-      Taro.navigateTo({
-        url: '/pages/live/live'
-      })
-    }
 
-  }
   // 返回
   goback = () => {
     console.info('go back');
@@ -47,12 +34,26 @@ export default class Home extends Component {
     console.info('close drawer');
   }
 
-  toWatch = (item,index) => {
-    // 跳转到目的页面，打开观看直播页面
+  clickAccordion = () => {
+    if (this.state.accordionOpen) {
+      this.setState({
+        accordionOpen: false
+      });
+    }else {
+      this.setState({
+        accordionOpen: true
+      });
+    }
+    
+  }
+
+  videoCall = () => {
+    // 跳转到目的页面，打开主页页面
     Taro.navigateTo({
-      url: '/pages/watch/watch'
+      url: '/pages/videoCall/videoCall?key=123'
     })
   }
+
 
   render() {
     return (
@@ -71,61 +72,32 @@ export default class Home extends Component {
             </View>
             <View className='at-row'>
                 <View className='at-col'>
-                    <Swiper
-                        className='test-h'
-                        indicatorColor='#999'
-                        indicatorActiveColor='#333'                       
-                        circular
-                        indicatorDots
-                        autoplay>
-                        <SwiperItem>
-                        <View className='demo-text-1'>1</View>
-                        </SwiperItem>
-                        <SwiperItem>
-                        <View className='demo-text-2'>2</View>
-                        </SwiperItem>
-                        <SwiperItem>
-                        <View className='demo-text-3'>3</View>
-                        </SwiperItem>
-                    </Swiper>
-                </View>
-            </View>
-            <View className='at-row'>
-                <View className='at-col'>
-                    <AtGrid onClick={this.toWatch} columnNum={2} data={
-                        [
-                        {
-                            image: 'https://img12.360buyimg.com/jdphoto/s72x72_jfs/t6160/14/2008729947/2754/7d512a86/595c3aeeNa89ddf71.png',
-                            value: '直播1'
-                        },
-                        {
-                            image: 'https://img20.360buyimg.com/jdphoto/s72x72_jfs/t15151/308/1012305375/2300/536ee6ef/5a411466N040a074b.png',
-                            value: '直播2'
-                        },
-                        {
-                            image: 'https://img10.360buyimg.com/jdphoto/s72x72_jfs/t5872/209/5240187906/2872/8fa98cd/595c3b2aN4155b931.png',
-                            value: '直播3'
-                        },
-                        {
-                            image: 'https://img12.360buyimg.com/jdphoto/s72x72_jfs/t10660/330/203667368/1672/801735d7/59c85643N31e68303.png',
-                            value: '直播4'
-                        }
-                        ]
-                    } />
-                </View>
-            </View>
-            <View className='at-row'>
-                <View className='at-col'>
-                    <AtTabBar
-                    fixed
-                    tabList={[
-                        { title: '订阅', iconType: 'star' },
-                        { title: '直播', iconType: 'video' },
-                        { title: '信息', iconType: 'bell', text: '100', max: '99' }
-                    ]}
-                    onClick={this.handleTabClick}
-                    current={this.state.tabCurrent}
-                    />
+                  <AtAccordion 
+                    open={this.state.accordionOpen}
+                    onClick={this.clickAccordion}
+                    title='默认列表' icon={{ value: 'chevron-down', color: 'red', size: '15' }}>
+                    <AtList hasBorder={false}>
+                      <AtListItem
+                        onClick={this.videoCall}
+                        title='好友一'
+                        extraText='点击通话'
+                        arrow='right'
+                        thumb='https://img12.360buyimg.com/jdphoto/s72x72_jfs/t6160/14/2008729947/2754/7d512a86/595c3aeeNa89ddf71.png'
+                      />
+                      <AtListItem
+                        title='好友二'
+                        extraText='点击通话'
+                        arrow='right'
+                        thumb='http://img10.360buyimg.com/jdphoto/s72x72_jfs/t5872/209/5240187906/2872/8fa98cd/595c3b2aN4155b931.png'
+                      />
+                      <AtListItem
+                        title='好友三'
+                        extraText='点击通话'
+                        arrow='right'
+                        thumb='http://img12.360buyimg.com/jdphoto/s72x72_jfs/t10660/330/203667368/1672/801735d7/59c85643N31e68303.png'
+                      />
+                    </AtList>
+                  </AtAccordion> 
                 </View>
             </View>
             <AtDrawer 
