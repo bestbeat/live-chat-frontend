@@ -1,5 +1,5 @@
 const config = {
-  projectName: 'IM-Front',
+  projectName: 'IM-Front', 
   date: '2019-4-9',
   designWidth: 750,
   deviceRatio: {
@@ -93,9 +93,11 @@ const config = {
     },
     esnextModules: ['taro-ui'],
     devServer: {
-      host: '192.168.199.230',
-      useLocalIp: false,
-      https: true
+      host: 'ninetwotest.mobi', // 笔记本
+      // host: '192.168.43.99', // 手机热点
+      
+      // https: true
+      
     }
   }
 }

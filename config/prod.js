@@ -1,6 +1,8 @@
 module.exports = {
   env: {
-    NODE_ENV: '"production"'
+    NODE_ENV: '"production"',
+    BACKEND_URL: '"https://118.31.108.252/backend"',
+    SIGNALING_URL: '"wss://118.31.108.252/signaling"'
   },
   defineConstants: {
   },

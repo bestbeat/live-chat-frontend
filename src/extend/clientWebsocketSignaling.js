@@ -1,64 +1,72 @@
+import Taro from '@tarojs/taro'
+
 const signalingChannel = {
     
-    id : '',
-    status : '',
 
-    doNothing : function() {},   
+    init : function(handlers) {
 
-    create : function(handlers) {
+        function doNothing(){}; 
 
         function initHandler (h) {
-            return ((typeof h === 'function') && h) || this.doNothing;
+            return ((typeof h === 'function') && h) || doNothing;
         };
 
         handlers  = handlers || {};
         
         signalingChannel.waitingHandler = initHandler(handlers.onWaiting),
         signalingChannel.connectedHandler = initHandler(handlers.onConnected),
+
         signalingChannel.messageHandler = initHandler(handlers.onMessage),
-        signalingChannel.openHandler = initHandler(handlers.onOpen);
-        console.log(signalingChannel);
+        signalingChannel.openHandler = initHandler(handlers.onOpen),
+        signalingChannel.errorHandler = initHandler(handlers.onError),
+        signalingChannel.closeHandler = initHandler(handlers.onClose);
     },
 
-    connect : function (failureCB){
+    connect : function (roomId){
 
-        if ('WebSocket' in window) {
-            this.webSocket = new WebSocket('wss://192.168.199.230:8080/signaling');
-            console.info(this.webSocket);
-        } else {
-            alert(' 该浏览器不支持 WebSocket ');
-        }
-
-        var failureCB = (typeof failureCB === 'function') || function() {};
-        //连接发生错误的回调方法
-        this.webSocket.onerror = failureCB;
-        //连接成功建立的回调方法
-        this.webSocket.onopen = function() {
-            signalingChannel.openHandler();
-        }
-        //接收到消息的回调方法
-        this.webSocket.onmessage = function(msg) {
-            signalingChannel.messageHandler(msg);
-        };
-        //连接关闭的回调方法
-        this.webSocket.onclose = function() {
-            this.webSocket.close();
-        }
-        //监听窗口关闭事件，当窗口关闭时，主动去关闭websocket连接，防止连接还没断开就关闭窗口，server端会抛异常。
-        window.onbeforeunload = function() {
-            this.webSocket.close();
-        }
-
+        Taro.connectSocket({
+            url: process.env.SIGNALING_URL+"/"+roomId,
+            success: function () {
+              console.log('connect success')
+            },
+            fail : function (e) {
+                console.log(e)
+            },
+            complete : function() {
+                console.log("connect requset send")
+            }
+            
+          }).then(task => {
+                signalingChannel.task = task;
+                signalingChannel.task.onOpen(signalingChannel.openHandler);
+                signalingChannel.task.onMessage(function (msg) {
+                    signalingChannel.messageHandler(msg);
+                });
+                signalingChannel.task.onError(signalingChannel.errorHandler);
+                signalingChannel.task.onClose(signalingChannel.closeHandler);
+          });
     },
 
     //关闭连接
-    closeWebSocket : function () {
-        this.webSocket.close();
+    close : function () {
+        signalingChannel.task.close({
+            code: 1000,
+            reason: "common close",
+            success: function() {
+                console.log("close success")
+            },
+            fail: function(e) {
+                console.log(e)
+            },
+            complete: function() {
+                console.log("close request send")
+            }
+        });
     },
 
-    // 通过信令通道向另一端的浏览器发送消息
+    // 通过信令通道发送消息
     send : function (msg) {
-        this.webSocket.send(msg);
+        signalingChannel.task.send(msg);
     }
 };
 

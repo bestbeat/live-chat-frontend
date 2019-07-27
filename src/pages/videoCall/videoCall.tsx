@@ -2,7 +2,7 @@ import Taro, { Component, Config } from '@tarojs/taro'
 import { View,Video } from '@tarojs/components'
 import { AtNavBar } from 'taro-ui'
 import './videoCall.scss'
-import {videoCall} from '../../extend/videoCallJS.js'
+import {videoChat} from '../../extend/videoChat.js'
 
 export default class VideoCall extends Component {
 
@@ -16,13 +16,17 @@ export default class VideoCall extends Component {
   }
   
   componentDidMount() {
-    videoCall.init('localVideo','remoteVideo',this.$router.params);
-    // videoCall.send({method:'connect',secretKey:this.$router.params['key']});
+    videoChat.init(4,this.$router.params);
   }
 
   // 结束通话
   hangup = () => {
-    console.info('hang up');
+    console.log("hang up");
+    videoChat.close();
+    // 跳转到目的页面，打开主页页面
+    Taro.navigateTo({
+      url: '/pages/home/home'
+    })
   }
 
   render() {
@@ -38,27 +42,37 @@ export default class VideoCall extends Component {
                     />
                 </View>
             </View>
-            <View className='at-row'>
-                <View className='at-col'>
+            <View className='at-row '>
+                <View className='at-col '>
                     <Video
-                    controls={true}
-                    autoplay={false}
-                    poster='http://misc.aotu.io/booxood/mobile-video/cover_900x500.jpg'
-                    initialTime='0'
-                    id='localVideo'
+                    autoplay={true}
+                    id='remoteVideo0'
+                    loop={false}
+                    muted={false}
+                    />
+                </View>
+                <View className='at-col '>
+                    <Video
+                    autoplay={true}
+                    id='remoteVideo1'
                     loop={false}
                     muted={false}
                     />
                 </View>
             </View>
-            <View className='at-row'>
-                <View className='at-col'>
+            <View className='at-row '>
+                <View className='at-col '>
                     <Video
-                    controls={true}
-                    autoplay={false}
-                    poster='http://misc.aotu.io/booxood/mobile-video/cover_900x500.jpg'
-                    initialTime='0'
-                    id='remoteVideo'
+                    autoplay={true}
+                    id='remoteVideo2'
+                    loop={false}
+                    muted={false}
+                    />
+                </View>
+                <View className='at-col '>
+                    <Video
+                    autoplay={true}
+                    id='remoteVideo3'
                     loop={false}
                     muted={false}
                     />

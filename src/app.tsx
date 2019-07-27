@@ -21,9 +21,8 @@ class App extends Component {
   config: Config = {
     pages: [
       'pages/index/index',
+      'pages/register/register',
       'pages/home/home',
-      'pages/live/live',
-      'pages/watch/watch',
       'pages/videoCall/videoCall'
     ],
     window: {

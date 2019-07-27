@@ -1,12 +1,12 @@
 import Taro, { Component, Config } from '@tarojs/taro'
 import { View} from '@tarojs/components'
-import { AtAccordion,AtList,AtListItem,AtNavBar,AtDrawer } from 'taro-ui'
+import { AtActionSheet,AtActionSheetItem,AtInput,AtAccordion,AtList,AtListItem,AtNavBar,AtDrawer,AtTabBar } from 'taro-ui'
 import './home.scss'
 
 export default class Home extends Component {
 
   config: Config = {
-    navigationBarTitleText: '主页'
+    navigationBarTitleText: '圈子-主页'
   }
 
   constructor() {
@@ -15,26 +15,47 @@ export default class Home extends Component {
       // 用户操作列表弹出开关
       drawerShow: false,
       // 手风琴状态
-      accordionOpen: true
+      accordionOpen: true,
+      actionSheet: false,
+      roomName: '',
+      rooms:new Array()
     }
   }
+
+  componentDidMount = () => {
+    const that = this;
+    Taro.request({
+      url: process.env.BACKEND_URL+"/home/room",
+      method: "GET",
+      success: function(res){
+        console.log(res.data);
+        if (res.statusCode == 200) {
+          that.setState({
+            rooms: res.data
+          });
+        }
+      },
+      fail: function(e){
+        console.log(e);
+      }
+    });
+  }
+
   // 去用户操作列表
   toOpList = ()=> {
     this.setState({
       drawerShow: true
     });
+    return;
   }
 
-  // 返回
-  goback = () => {
-    console.info('go back');
-  }
   // 用户列表关闭出发时间
   closeOpList (e) {
     console.info('close drawer');
   }
 
   clickAccordion = () => {
+    
     if (this.state.accordionOpen) {
       this.setState({
         accordionOpen: false
@@ -44,28 +65,96 @@ export default class Home extends Component {
         accordionOpen: true
       });
     }
+    return ;
     
   }
 
-  videoCall = () => {
-    // 跳转到目的页面，打开主页页面
+  videoCall = (roomId) => {
+    // 跳转到目的页面，打开房间视频通话页面
     Taro.navigateTo({
-      url: '/pages/videoCall/videoCall?key=123'
+      url: '/pages/videoCall/videoCall?roomId='+roomId
     })
   }
 
+  handleTabBar = () => {
+    this.setState({
+      actionSheet: true
+    });
+  }
+
+  newRoom = () => {
+    
+    if (!this.state.roomName) {
+      console.log("roomName is null");
+      return;
+    }
+    const that = this;
+    Taro.request({
+      url: process.env.BACKEND_URL+"/home/room",
+      header:{
+        'Content-type': 'application/json;charset=UTF-8'
+      },
+      method: "POST",
+      data: JSON.stringify({
+              'roomName': this.state.roomName,
+              'creater': 'tester'
+            }),
+      success: function(res){
+        console.log(res.data);
+        if (res.statusCode == 200) {
+          const newRoom = {
+            roomName: that.state.roomName,
+            roomId: res.data
+          }
+
+          const rooms = that.state.rooms;
+          rooms.push(newRoom);
+          that.setState({
+            rooms: rooms,
+            actionSheet: false
+          });
+
+        }
+      },
+      fail: function(e){
+        console.log(e);
+      }
+    });
+  }
+
+  actionSheetClose = () => {
+    this.setState({
+      actionSheet: false
+    });
+  }
+
+  roomNameChange = (e) => {
+    console.log(e);
+    this.setState({
+      roomName: e
+    });
+  }
 
   render() {
+
+    const rooms = this.state.rooms.map((room) => {
+      return <AtListItem
+                onClick={this.videoCall.bind(this,room.roomId)}
+                title= {room.roomName}
+                extraText='进入房间'
+                arrow='right'
+              />
+    });
+
+
     return (
         <View>
             <View className='at-row'>
                 <View className='at-col'>
                   <AtNavBar
                   onClickRgIconSt={this.toOpList}
-                  onClickLeftIcon={this.goback}
                   color='#000'
                   title='主页'
-                  leftText='返回'
                   rightFirstIconType='user'
                   />
                 </View>
@@ -78,26 +167,26 @@ export default class Home extends Component {
                     title='默认列表' icon={{ value: 'chevron-down', color: 'red', size: '15' }}>
                     <AtList hasBorder={false}>
                       <AtListItem
-                        onClick={this.videoCall}
-                        title='好友一'
-                        extraText='点击通话'
+                        onClick={this.videoCall.bind(this,'default')}
+                        title='默认房间'
+                        extraText='进入房间'
                         arrow='right'
-                        thumb='https://img12.360buyimg.com/jdphoto/s72x72_jfs/t6160/14/2008729947/2754/7d512a86/595c3aeeNa89ddf71.png'
                       />
-                      <AtListItem
-                        title='好友二'
-                        extraText='点击通话'
-                        arrow='right'
-                        thumb='http://img10.360buyimg.com/jdphoto/s72x72_jfs/t5872/209/5240187906/2872/8fa98cd/595c3b2aN4155b931.png'
-                      />
-                      <AtListItem
-                        title='好友三'
-                        extraText='点击通话'
-                        arrow='right'
-                        thumb='http://img12.360buyimg.com/jdphoto/s72x72_jfs/t10660/330/203667368/1672/801735d7/59c85643N31e68303.png'
-                      />
+                      {rooms}
                     </AtList>
                   </AtAccordion> 
+                </View>
+            </View>
+            <View className='at-row'>
+                <View className='at-col'>
+                  <AtTabBar
+                    fixed
+                    tabList={[
+
+                      { title: '添加房间', iconType: 'add' },
+                    ]}
+                    onClick={this.handleTabBar}
+                  />
                 </View>
             </View>
             <AtDrawer 
@@ -107,6 +196,17 @@ export default class Home extends Component {
               onClose={this.closeOpList.bind(this)} 
               items={['设置', '注销']}
             ></AtDrawer>
+            <AtActionSheet isOpened={this.state.actionSheet} cancelText='添加' title='添加房间' onCancel={ this.newRoom } onClose={ this.actionSheetClose }>
+              <AtActionSheetItem >
+                <AtInput
+                  name='room-name'
+                  type='text'
+                  placeholder='房间标题'
+                  value={this.state.roomName}
+                  onChange={this.roomNameChange}
+                />
+              </AtActionSheetItem>
+            </AtActionSheet>
           </View>
     )
   }
